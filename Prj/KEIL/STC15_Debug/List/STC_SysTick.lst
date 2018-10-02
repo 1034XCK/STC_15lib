@@ -1,0 +1,183 @@
+C51 COMPILER V9.54   STC_SYSTICK                                                           08/14/2018 15:33:59 PAGE 1   
+
+
+C51 COMPILER V9.54, COMPILATION OF MODULE STC_SYSTICK
+OBJECT MODULE PLACED IN .\Prj\KEIL\STC15_Debug\Obj\STC_SysTick.obj
+COMPILER INVOKED BY: E:\program files\Keil C51 v5\C51\BIN\C51.EXE Chip\src\STC_SysTick.c LARGE OMF2 OPTIMIZE(9,SPEED) RE
+                    -GFILE(.\Prj\KEIL\STC15_Debug\Obj\雪之澜_STC单片机库_v2.ORC) BROWSE MODP2 INCDIR(..\文档;.\App\Inc;.\Board\inc;.\Chip\Inc
+                    -;.\Chip\Inc\kinetis) DEBUG PRINT(.\Prj\KEIL\STC15_Debug\List\STC_SysTick.lst) TABS(2) OBJECT(.\Prj\KEIL\STC15_Debug\Obj\
+                    -STC_SysTick.obj)
+
+line level    source
+
+   1          /*
+   2           * 包含头文件
+   3           */
+   4           #include "common.h"
+   5           #include "STC_SysTick.h"
+   6           
+   7           /*!
+   8           *  @brief    短时间微秒级延时函数
+   9           *  @param    time_us       延时时间，范围是0~255us，单位为微秒
+  10           *  @warning  33.0000MHz->24个nop
+  11                        28.0000MHz->18个nop
+  12                        27.0000MHz->17个nop
+  13                        24.0000MHz->14个nop
+  14                        22.1184MHz->12个nop
+  15                        20.0000MHz->10个nop
+  16                        18.4320MHz-> 8个nop
+  17                        12.0000MHz-> 2个nop
+  18                        11.0592MHz-> 1个nop
+  19                        <10.000MHz-> 0个，但非常不准！
+  20           *  @warning  时间请自行校准，在系统时钟非整数的情况下会出现较大误差
+  21           *  @sampleusage: systick_delay_us(255); //延时255us
+  22           */
+  23          
+  24          void systick_delay_us(uint8 time_us)//短时间微秒级延时函数
+  25          {
+  26   1        if(time_us==0)
+  27   1          return;
+  28   1        while(--time_us)
+  29   1        {
+  30   2      #if (EXTAL_IN_Hz >= 11000000)
+  31   2          _nop_();//1个
+  32   2      #endif
+  33   2      #if (EXTAL_IN_Hz >= 12000000)
+  34   2          _nop_();//2个
+  35   2      #endif
+  36   2      #if (EXTAL_IN_Hz >= 18000000)
+  37   2          _nop_();_nop_();_nop_();_nop_();
+  38   2          _nop_();_nop_();//8个
+  39   2      #endif
+  40   2      #if (EXTAL_IN_Hz >= 20000000)
+  41   2          _nop_();_nop_();//10个
+  42   2      #endif
+  43   2      #if (EXTAL_IN_Hz >= 22000000)
+  44   2          _nop_();_nop_();//12个
+  45   2      #endif
+  46   2      #if (EXTAL_IN_Hz >= 24000000)
+  47   2          _nop_();_nop_();//14个
+  48   2      #endif
+  49   2      #if (EXTAL_IN_Hz >= 27000000)
+  50   2          _nop_();_nop_();_nop_();//17个
+  51   2      #endif
+  52   2      #if (EXTAL_IN_Hz >= 28000000)
+C51 COMPILER V9.54   STC_SYSTICK                                                           08/14/2018 15:33:59 PAGE 2   
+
+  53   2          _nop_();//18个
+  54   2      #endif
+  55   2      #if (EXTAL_IN_Hz >= 30000000)
+  56   2          _nop_();_nop_();//20个
+  57   2      #endif
+  58   2      #if (EXTAL_IN_Hz >= 31000000)
+  59   2          _nop_();//21个
+  60   2      #endif
+  61   2      #if (EXTAL_IN_Hz >= 32000000)
+  62   2          _nop_();//22个
+  63   2      #endif
+  64   2      #if (EXTAL_IN_Hz >= 33000000)
+  65   2          _nop_();//23个
+  66   2      #endif
+  67   2      #if (EXTAL_IN_Hz >= 34000000)
+  68   2          _nop_();//24个
+  69   2      #endif
+  70   2      #if (EXTAL_IN_Hz >= 35000000)
+  71   2          _nop_();//25个
+  72   2      #endif
+  73   2        }
+  74   1      }
+  75          
+  76           /*!
+  77           *  @brief    长时间微秒级延时函数
+  78           *  @param    time_us       延时时间，范围是4~65535us，单位为微秒
+  79           *  @warning  33.0000MHz->17个nop
+  80                        28.0000MHz->12个nop
+  81                        27.0000MHz->11个nop
+  82                        24.0000MHz-> 8个nop
+  83                        22.1184MHz-> 6个nop
+  84                        20.0000MHz-> 4个nop
+  85                        18.4320MHz-> 2个nop
+  86                        <16.000MHz-> 0个，但非常不准！
+  87           *  @warning  时间请自行校准，在系统时钟非整数的情况下会出现较大误差
+  88           *  @sampleusage: systick_delay_us(32767); //延时65535us
+  89           */
+  90          
+  91          void systick_delay_lus(uint16 time_us)//长时间微秒级延时函数
+  92          {
+  93   1        if(time_us==0)
+  94   1          return;
+  95   1        while(--time_us)
+  96   1        {
+  97   2      #if (EXTAL_IN_Hz >= 17000000)
+  98   2          _nop_();//1个
+  99   2      #endif
+ 100   2      #if (EXTAL_IN_Hz >= 18000000)
+ 101   2          _nop_();//2个
+ 102   2      #endif
+ 103   2      #if (EXTAL_IN_Hz >= 20000000)
+ 104   2          _nop_();_nop_();//4个
+ 105   2      #endif
+ 106   2      #if (EXTAL_IN_Hz >= 22000000)
+ 107   2          _nop_();_nop_();//6个
+ 108   2      #endif
+ 109   2      #if (EXTAL_IN_Hz >= 24000000)
+ 110   2          _nop_();_nop_();//8个
+ 111   2      #endif
+ 112   2      #if (EXTAL_IN_Hz >= 27000000)
+ 113   2          _nop_();_nop_();_nop_();//11个
+ 114   2      #endif
+C51 COMPILER V9.54   STC_SYSTICK                                                           08/14/2018 15:33:59 PAGE 3   
+
+ 115   2      #if (EXTAL_IN_Hz >= 28000000)
+ 116   2          _nop_();//12个
+ 117   2      #endif
+ 118   2      #if (EXTAL_IN_Hz >= 30000000)
+ 119   2          _nop_();_nop_();//14个
+ 120   2      #endif
+ 121   2      #if (EXTAL_IN_Hz >= 33000000)
+ 122   2          _nop_();_nop_();_nop_();//17个
+ 123   2      #endif
+ 124   2      #if (EXTAL_IN_Hz >= 34000000)
+ 125   2          _nop_();//18个
+ 126   2      #endif
+ 127   2      #if (EXTAL_IN_Hz >= 35000000)
+ 128   2          _nop_();//19个
+ 129   2      #endif
+ 130   2        }
+ 131   1      }
+ 132          
+ 133          
+ 134           /*!
+ 135           *  @brief    长时间毫秒级延时函数
+ 136           *  @param    time_ms       延时时间，范围是0~65535ms，单位为毫秒
+ 137           *  @warning  请注意调整长时间微秒级延时的精度
+ 138           *  @sampleusage: systick_delay_ms(65535); //延时65535ms
+ 139           */
+ 140          
+ 141          void systick_delay_ms(uint16 time_ms)//毫秒级延时函数
+ 142          {
+ 143   1        if(time_ms==0)
+ 144   1          return;
+ 145   1        while(time_ms--)
+ 146   1        {
+ 147   2          systick_delay_lus(1000);
+ 148   2        }
+ 149   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =     98    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+   EDATA SIZE       =   ----    ----
+   HDATA SIZE       =   ----    ----
+   XDATA CONST SIZE =   ----    ----
+   FAR CONST SIZE   =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

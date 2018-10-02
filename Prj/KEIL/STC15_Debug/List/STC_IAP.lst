@@ -1,0 +1,121 @@
+C51 COMPILER V9.54   STC_IAP                                                               08/14/2018 15:33:59 PAGE 1   
+
+
+C51 COMPILER V9.54, COMPILATION OF MODULE STC_IAP
+OBJECT MODULE PLACED IN .\Prj\KEIL\STC15_Debug\Obj\STC_IAP.obj
+COMPILER INVOKED BY: E:\program files\Keil C51 v5\C51\BIN\C51.EXE Chip\src\STC_IAP.c LARGE OMF2 OPTIMIZE(9,SPEED) REGFIL
+                    -E(.\Prj\KEIL\STC15_Debug\Obj\雪之澜_STC单片机库_v2.ORC) BROWSE MODP2 INCDIR(..\文档;.\App\Inc;.\Board\inc;.\Chip\Inc;.\C
+                    -hip\Inc\kinetis) DEBUG PRINT(.\Prj\KEIL\STC15_Debug\List\STC_IAP.lst) TABS(2) OBJECT(.\Prj\KEIL\STC15_Debug\Obj\STC_IAP.
+                    -obj)
+
+line level    source
+
+   1          #include "common.h"
+   2          #include "STC_IAP.h"
+   3          
+   4          /*!
+   5           *  @brief    关闭IAP功能   
+   6           *  @param    
+   7           *  @warning  
+   8           *  @sampleusage: IAP_idle(); //关闭IAP功能
+   9           */
+  10           
+  11           void IAP_idle(void)  //关闭IAP功能
+  12           {
+  13   1         IAP_CONTR = 0x00;
+  14   1         IAP_CMD   = 0x00;
+  15   1         IAP_TRIG  = 0x00;
+  16   1         IAP_ADDRH = 0xFF;
+  17   1         IAP_ADDRL = 0xFF;
+  18   1       }
+  19           
+  20           /*!
+  21           *  @brief    读EEPROM中某一地址内的1字节内容
+  22           *  @param    addr  要读取的地址
+  23           *  @warning  
+  24           *  @sampleusage: IAP_read_byte(0x0003); //读取地址为0x003内的8位数据并返回
+  25           */
+  26           
+  27          uint8 IAP_read_byte(uint16 addr)//读EEPROM中某一地址内的1字节内容
+  28           {
+  29   1         uint8 IAP_read_data = 0;
+  30   1         
+  31   1         BIT_SET(IAP_CONTR,7);//允许IAP功能
+  32   1         REPLACE(IAP_CONTR,6,4,0);//不重启，下次启动从用户应用程序区开始执行，清除IAP操作失败标志
+  33   1         REPLACE(IAP_CONTR,2,0,ISP_WAIT_FREQUENCY);//根据晶振频率自主匹配等待时间
+  34   1         REPLACE(IAP_CMD,1,0,1);//IAP为读模式
+  35   1         IAP_ADDRL = addr;    //配置需要读取的地址底8位
+  36   1         IAP_ADDRH = addr>>8; //配置需要读取的地址高8位
+  37   1         IAP_TRIG  = 0x5a;//触发执行准备
+  38   1         IAP_TRIG  = 0xa5;//触发执行开始
+  39   1         _nop_();//给触发操作预留一定反应时间
+  40   1         IAP_read_data = IAP_DATA;//将读取到的值存于临时变量IAP_read_data中
+  41   1         IAP_idle();//临走前关闭IAP功能
+  42   1         return IAP_read_data;//返回读取到的8位数据
+  43   1       }
+  44           
+  45           /*!
+  46           *  @brief    写EEPROM中某一地址内的数据
+  47           *  @param    addr        要写入的地址
+  48                        write_data  要写入的数据
+  49           *  @warning  已经写过一次的地址若想要再次写入以修改参数，需先将整块扇区擦除再方可写入此地址，否则此地址内的
+             -数据将不可预知，但不会殃及其他地址内数据
+  50           *  @sampleusage: IAP_write_byte(0x0002 , 50); //将数据50写入到0x0002这个地址
+  51           */
+C51 COMPILER V9.54   STC_IAP                                                               08/14/2018 15:33:59 PAGE 2   
+
+  52          
+  53          void IAP_write_byte(uint16 addr , uint8 write_data)
+  54           {
+  55   1         BIT_SET(IAP_CONTR,7);//允许IAP功能
+  56   1         REPLACE(IAP_CONTR,6,4,0);//不重启，下次启动从用户应用程序区开始执行，清除IAP操作失败标志
+  57   1         REPLACE(IAP_CONTR,2,0,ISP_WAIT_FREQUENCY);//根据晶振频率自主匹配等待时间
+  58   1         REPLACE(IAP_CMD,1,0,2);//IAP为写模式
+  59   1         IAP_ADDRL = addr;    //配置需要写入的地址底8位
+  60   1         IAP_ADDRH = addr>>8; //配置需要写入的地址高8位
+  61   1         IAP_DATA  = write_data;//装入要写入的数据
+  62   1         IAP_TRIG  = 0x5a;//触发执行准备
+  63   1         IAP_TRIG  = 0xa5;//触发执行开始
+  64   1         _nop_();//给触发操作预留一定反应时间
+  65   1         IAP_idle();//临走前关闭IAP功能
+  66   1       }
+  67           
+  68           /*!
+  69           *  @brief    整扇区擦除
+  70           *  @param    addr    要擦除的扇区内地址
+  71           *  @warning  addr地址所在扇区内的全部数据将被擦除
+  72                        在同一地址第二次写入新数据前，必须将该扇区擦除
+  73           *  @sampleusage: IAP_erase_sector(【0x0000 ~ 0x1ff】); //擦除第一扇区
+  74           */
+  75          
+  76          void IAP_erase_sector(uint16 addr)
+  77          {
+  78   1        BIT_SET(IAP_CONTR,7);//允许IAP功能
+  79   1        REPLACE(IAP_CONTR,6,4,0);//不重启，下次启动从用户应用程序区开始执行，清除IAP操作失败标志
+  80   1        REPLACE(IAP_CONTR,2,0,ISP_WAIT_FREQUENCY);//根据晶振频率自主匹配等待时间
+  81   1        REPLACE(IAP_CMD,1,0,3);//IAP为扇区擦除模式
+  82   1        IAP_ADDRL = addr;   //配置需要擦除的地址底8位
+  83   1        IAP_ADDRH = addr>>8;//配置需要擦除的地址高8位
+  84   1        IAP_TRIG  = 0x5a;//触发执行准备
+  85   1        IAP_TRIG  = 0xa5;//触发执行开始
+  86   1        _nop_();//给触发操作预留一定反应时间
+  87   1        IAP_idle();//临走前关闭IAP功能
+  88   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =     96    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+   EDATA SIZE       =   ----    ----
+   HDATA SIZE       =   ----    ----
+   XDATA CONST SIZE =   ----    ----
+   FAR CONST SIZE   =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

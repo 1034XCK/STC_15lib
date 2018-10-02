@@ -1,0 +1,82 @@
+C51 COMPILER V9.54   STC_WS2812                                                            08/14/2018 15:33:58 PAGE 1   
+
+
+C51 COMPILER V9.54, COMPILATION OF MODULE STC_WS2812
+OBJECT MODULE PLACED IN .\Prj\KEIL\STC15_Debug\Obj\STC_WS2812.obj
+COMPILER INVOKED BY: E:\program files\Keil C51 v5\C51\BIN\C51.EXE Board\src\STC_WS2812.c LARGE OMF2 OPTIMIZE(9,SPEED) RE
+                    -GFILE(.\Prj\KEIL\STC15_Debug\Obj\雪之澜_STC单片机库_v2.ORC) BROWSE MODP2 INCDIR(..\文档;.\App\Inc;.\Board\inc;.\Chip\Inc
+                    -;.\Chip\Inc\kinetis) DEBUG PRINT(.\Prj\KEIL\STC15_Debug\List\STC_WS2812.lst) TABS(2) OBJECT(.\Prj\KEIL\STC15_Debug\Obj\S
+                    -TC_WS2812.obj)
+
+line level    source
+
+   1          #include "STC_WS2812.h"
+   2          
+   3          /*!
+   4           *  @brief    WS2812初始化 或 帧结束符
+   5           *  @param    
+   6           *  @warning  
+   7           *  @sampleusage: init_ws2812_or_end_frame();
+   8           */
+   9          
+  10          bool init_ws2812_or_end_frame(void)
+  11          {
+  12   1        WS2812_D = 0;
+  13   1        DELAY_US(50);
+  14   1        if(WS2812_D) return false;
+  15   1        else return true;
+  16   1      }
+  17          
+  18          /*!
+  19           *  @brief    刷写WS2812让其显示
+  20           *  @param    num 要传输数据的字节数(一个灯珠花掉3个字节，分别为绿色、红色、蓝色的亮度等级)，可取数组的sizeof
+             -()计算长度
+  21                        *p  要传输数据所存放的数组的首地址，必须以取地址符号&进入
+  22           *  @warning  该函数只负责数据传输，传输完一帧数据流后请按照实际情况给出一大于24us的帧结束时间
+  23           *  @sampleusage: WS2812_display(sizeof(A) , &A[0][0]);
+  24           */
+  25          
+  26          void WS2812_display(uint8 data num , uint8 *p)
+  27          {
+  28   1        uint8 data d=0;
+  29   1        while(num--)
+  30   1        {
+  31   2          d = *p++;
+  32   2          if(d&0x80) SEND_H_DATA
+  33   2          else SEND_L_DATA
+  34   2          if(d&0x80) SEND_H_DATA
+  35   2          else SEND_L_DATA
+  36   2          if(d&0x80) SEND_H_DATA
+  37   2          else SEND_L_DATA
+  38   2          if(d&0x80) SEND_H_DATA
+  39   2          else SEND_L_DATA
+  40   2          if(d&0x80) SEND_H_DATA
+  41   2          else SEND_L_DATA
+  42   2          if(d&0x80) SEND_H_DATA
+  43   2          else SEND_L_DATA
+  44   2          if(d&0x80) SEND_H_DATA
+  45   2          else SEND_L_DATA
+  46   2          if(d&0x80) SEND_H_DATA
+  47   2          else SEND_L_DATA
+  48   2        }
+  49   1      }
+
+
+C51 COMPILER V9.54   STC_WS2812                                                            08/14/2018 15:33:58 PAGE 2   
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    391    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----       3
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----       1
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+   EDATA SIZE       =   ----    ----
+   HDATA SIZE       =   ----    ----
+   XDATA CONST SIZE =   ----    ----
+   FAR CONST SIZE   =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

@@ -1,0 +1,431 @@
+C51 COMPILER V9.54   STC_SOFT_IIC                                                          08/14/2018 15:34:00 PAGE 1   
+
+
+C51 COMPILER V9.54, COMPILATION OF MODULE STC_SOFT_IIC
+OBJECT MODULE PLACED IN .\Prj\KEIL\STC15_Debug\Obj\STC_soft_IIC.obj
+COMPILER INVOKED BY: E:\program files\Keil C51 v5\C51\BIN\C51.EXE Chip\src\STC_soft_IIC.c LARGE OMF2 OPTIMIZE(9,SPEED) R
+                    -EGFILE(.\Prj\KEIL\STC15_Debug\Obj\Ñ©Ö®À½_STCµ¥Æ¬»ú¿â_v2.ORC) BROWSE MODP2 INCDIR(..\ÎÄµµ;.\App\Inc;.\Board\inc;.\Chip\In
+                    -c;.\Chip\Inc\kinetis) DEBUG PRINT(.\Prj\KEIL\STC15_Debug\List\STC_soft_IIC.lst) TABS(2) OBJECT(.\Prj\KEIL\STC15_Debug\Ob
+                    -j\STC_soft_IIC.obj)
+
+line level    source
+
+   1          #include "common.h"
+   2          #include "STC_gpio.h"
+   3          #include "STC_soft_IIC.h"
+   4          
+   5          /*!
+   6           *  @brief    IIC³õÊ¼»¯
+   7           *  @param    SCL_pxn  SCLËù¶ÔÓ¦µÄÒý½Å(Ð¡Ð´ÀàÐÍ)
+   8                        SDA_pxn  SDAËù¶ÔÓ¦µÄÒý½Å(Ð¡Ð´ÀàÐÍ)
+   9           *  @warning  ´Ë³õÊ¼»¯º¯Êý²¢·Ç±ØÒª£¬Ó¦ÎªÖ»ÊÇ¶ÔIO¿ÚµÄ¹¤×÷Ä£Ê½ºÍ³õÊ¼µçÆ½×öÁË³õÊ¼»¯£¬¶øµ¥Æ¬»úÉÏµçºóÄ¬ÈÏµÄÉèÖÃ¾Í
+             -ÊÇ·ûºÏÒªÇóµÄ
+  10                        ´Ëº¯ÊýÓÐ·µ»ØÖµ£¬¶Ô³õÊ¼»¯ºóµÄÁ½¸ùÏßµÄµçÆ½½øÐÐ¼ì²â£¬Èô·ûºÏIIC×ÜÏßÏÐÖÃ±ê×¼½«»Ø¸´1£¬·ñÔò»Ø¸´0
+  11                        ¿¼ÂÇµ½IICÊÇÓÉÈí¼þÄ£ÄâµÄÊ±Ðò£¬ËùÒÔÐèÒª½Ï¸ßµÄÖ´ÐÐÐ§ÂÊ£¬¹ÊPORT_cfg.hÖÐ¶Ë¿ÚÉèÖÃÎª´óÐ´µÄPxx£¬¶ø´Ë
+             -º¯ÊýÒªÉèÖÃ¶Ë¿Ú¹¤×÷Ä£Ê½ÐèÊ¹ÓÃÐ¡Ð´µÄpxx¶Ë¿Ú±íÊ¾ÀàÐÍ£¬Á½ÖÐ±íÊ¾ÀàÐÍ²»¼æÈÝ£¬
+  12                        ¹ÊÈôÊ¹ÓÃ´Ëº¯Êý³õÊ¼»¯IIC¹¤×÷¶Ë¿ÚÇëÓëPORT_cfg.hÖÐµÄÉèÖÃ±£³ÖÒ»ÖÂ£¬ÈçÐè¸ü¸Ä¶Ë¿ÚÇëÎñ±Ø±£³ÖË«·½Ò»ÖÂ£¡
+  13                        Òò¶à¸öIICÉè±¸¿É¹ÒÔØÔÚÒ»Ìõ×ÜÏßÉÏ£¬ËùÒÔÖ»ÉèÖÃÁË1Â·IICÍ¨µÀ¿ÉÓÃ
+  14                        ×ÜÏßËÙ¶ÈÉèÖÃÓÉÏÂ·½µÄ#ifÍê³É£¬Èô×ÜÏßÉÏµÄÉè±¸¾ù¿É½ÓÊÜ1MHzÒÔÉÏµÄÊ±ÖÓ±ä»¯ÂÊ(¸ßËÙÄ£Ê½)¾ÍÌîÐ´#if 1 £¬ Èô²
+             -»ÄÜÂú×ã¾ÍÌî#if 0 ²¢¸ù¾ÝÊµ¼ÊÇé¿öÑ¡Ôñsystick_delay_us(x)ÀïµÄxÖµ(¿ÉÌîÐ´0-ÆÕÍ¨Ä£Ê½)
+  15                        ÐèÒª×¢ÒâµÄÊÇ×ÜÏßËÙ¶ÈÐè¸ù¾ÝÕâÌõ×ÜÏßÉÏ×îÂýµÄÉè±¸ÒªÇóÀ´ÉèÖÃ
+  16           *  @Sampleusage: IIC_init(p41 , p42);//P41×÷ÎªSCLÏß¡¢P42×÷ÎªSDAÏß
+  17           */
+  18          
+  19          #if 0
+               #define IIC_delay() _nop_()
+              #else
+  22           #define IIC_delay() systick_delay_us(1)
+  23          #endif
+  24          
+  25          bool IIC_init(pxn_e SCL_pxn , pxn_e SDA_pxn)
+  26          {
+  27   1        gpio_init(SCL_pxn, WEAKPULLUP, 1);
+  28   1        gpio_init(SDA_pxn, WEAKPULLUP, 1);
+  29   1        _nop_();
+  30   1        if (IIC_SCL && IIC_SDA) return true;
+  31   1        else return false;
+  32   1      }
+  33          
+  34          /*!
+  35           *  @brief    IICÆô¶¯ÐÅºÅ
+  36           *  @param    
+  37           *  @warning  ÈôÆô¶¯ÐÅºÅ·¢ËÍÊ§°Ü£¬ËµÃ÷×ÜÏßÕýÔÚ±»ÆäËûÖ÷¿ØÕ¼ÓÃ£¬»ò×ÜÏß´íÎó
+  38                        ¸Ãº¯ÊýÎªIICÐ­Òé²ã£¬²»¿É¸Ä¶¯(ÒÑÓÅ»¯ÔÚÈ·±£°²È«ÎÈ¶¨µÄÇ°ÌáÏÂ´úÂë×î¼ò»¯¡¢Õ¼ÓÃCPUÊ±¼ä×îÐ¡»¯)£¬²»¿É
+             -Íâ²¿µ÷ÓÃ
+  39           *  @Sampleusage: IIC_Start();//Æô¶¯ÐÅºÅ
+  40           */
+  41          
+  42          bool IIC_Start(void)
+  43          {
+  44   1        IIC_SCL = 1;//SCL = 1
+  45   1        IIC_SDA = 1;//SDA = 1
+  46   1        _nop_();
+  47   1        if (IIC_SCL && IIC_SDA)//±£Ö¤ÔÚ·¢ÆðÆô¶¯ÐÅºÅÇ°×ÜÏß´¦ÓÚ¿ÕÏÐ×´Ì¬£¬¼´IIC_SDAÓëIIC_SCL¶¼´¦ÓÚ¸ßµçÆ½×´Ì¬
+  48   1        {
+C51 COMPILER V9.54   STC_SOFT_IIC                                                          08/14/2018 15:34:00 PAGE 2   
+
+  49   2          IIC_SDA = 0;//SDA = 0
+  50   2          IIC_delay();
+  51   2          if (IIC_SDA) return false;//Êý¾ÝÏßÎ´ÄÜÀ­µÍ
+  52   2          else //Êý¾ÝÏßÒÔÀ­µÍ
+  53   2          {
+  54   3            IIC_SCL = 0;//SCL = 0
+  55   3            _nop_();
+  56   3            if(IIC_SCL) return false;//Ê±ÖÓÏßÎ´ÄÜÀ­µÍ
+  57   3            else return true; //Ê±ÖÓÏßÒÔÀ­µÍ£¬¿ªÊ¼ÐÅºÅ´«ÊäÍê±Ï
+  58   3          }
+  59   2        }
+  60   1        else return false;//×ÜÏßÎ´´¦ÓÚ¿ÕÏÐ×´Ì¬
+  61   1      }
+  62          
+  63          /*!
+  64           *  @brief    IICÍ£Ö¹ÐÅºÅ
+  65           *  @param    
+  66           *  @warning  ¸Ãº¯ÊýÎªIICÐ­Òé²ã£¬²»¿É¸Ä¶¯(ÒÑÓÅ»¯ÔÚÈ·±£°²È«ÎÈ¶¨µÄÇ°ÌáÏÂ´úÂë×î¼ò»¯¡¢Õ¼ÓÃCPUÊ±¼ä×îÐ¡»¯)£¬²»¿ÉÍâ
+             -²¿µ÷ÓÃ
+  67           *  @Sampleusage: IIC_Stop();//Í£Ö¹ÐÅºÅ
+  68           */
+  69          
+  70          void IIC_Stop(void)
+  71          {
+  72   1        IIC_SCL = 0;//SCL = 0
+  73   1        IIC_SDA = 0;//SDA = 0
+  74   1        IIC_delay();
+  75   1        IIC_SCL = 1;//SCL = 1
+  76   1        IIC_delay();
+  77   1        IIC_SDA = 1;//SDA = 1
+  78   1      }
+  79          
+  80          /*!
+  81           *  @brief    IICÖ÷»ú½ÓÊÕÓ¦´ðÐÅºÅ£¬¸æËß´Ó»úÄã·¢ËÍ¸øÎÒ(Ö÷»ú)µÄÊý¾ÝÎÒÒÑÊÕµ½
+  82           *  @param    
+  83           *  @warning  ¸Ãº¯ÊýÎªIICÐ­Òé²ã£¬²»¿É¸Ä¶¯(ÒÑÓÅ»¯ÔÚÈ·±£°²È«ÎÈ¶¨µÄÇ°ÌáÏÂ´úÂë×î¼ò»¯¡¢Õ¼ÓÃCPUÊ±¼ä×îÐ¡»¯)£¬²»¿ÉÍâ
+             -²¿µ÷ÓÃ
+  84           *  @Sampleusage: IIC_Ack();
+  85           */
+  86          
+  87          void IIC_Ack(void)
+  88          {
+  89   1        IIC_SDA = 0;//SDA = 0
+  90   1        IIC_delay();
+  91   1        IIC_SCL = 1;//SCL = 1
+  92   1        IIC_delay();
+  93   1        IIC_SCL = 0;//SCL = 0
+  94   1      }
+  95          
+  96          /*!
+  97           *  @brief    IICÖ÷»ú½ÓÊÕ»Ø¸´·ÇÓ¦´ðÐÅºÅ£¬¸æËß´Ó»úÄã·¢ËÍ¸øÎÒ(Ö÷»ú)µÄÊý¾ÝÎÒÃ»ÊÕµ½
+  98           *  @param    
+  99           *  @warning  ¸Ãº¯ÊýÎªIICÐ­Òé²ã£¬²»¿É¸Ä¶¯(ÒÑÓÅ»¯ÔÚÈ·±£°²È«ÎÈ¶¨µÄÇ°ÌáÏÂ´úÂë×î¼ò»¯¡¢Õ¼ÓÃCPUÊ±¼ä×îÐ¡»¯)£¬²»¿ÉÍâ
+             -²¿µ÷ÓÃ
+ 100           *  @Sampleusage: IIC_NoAck();
+ 101           */
+ 102          
+ 103          void IIC_NoAck(void)
+ 104          {
+ 105   1        IIC_SDA = 1;//SDA = 1
+ 106   1        IIC_delay();
+ 107   1        IIC_SCL = 1;//SCL = 1
+C51 COMPILER V9.54   STC_SOFT_IIC                                                          08/14/2018 15:34:00 PAGE 3   
+
+ 108   1        IIC_delay();
+ 109   1        IIC_SCL = 0;//SCL = 0
+ 110   1      }
+ 111          
+ 112          /*!
+ 113           *  @brief    IICÖ÷»ú½ÓÊÕÓ¦´ðÐÅºÅ
+ 114           *  @param    
+ 115           *  @warning  ¸Ãº¯ÊýÎªIICÐ­Òé²ã£¬²»¿É¸Ä¶¯(ÒÑÓÅ»¯ÔÚÈ·±£°²È«ÎÈ¶¨µÄÇ°ÌáÏÂ´úÂë×î¼ò»¯¡¢Õ¼ÓÃCPUÊ±¼ä×îÐ¡»¯)£¬²»¿ÉÍâ
+             -²¿µ÷ÓÃ
+ 116           *  @Sampleusage: IIC_GetAck();
+ 117           */
+ 118          
+ 119          bool IIC_GetAck(void)
+ 120          {
+ 121   1        IIC_SDA = 1;//SDA = 1
+ 122   1        IIC_delay();
+ 123   1        IIC_SCL = 1;//SCL = 1
+ 124   1        IIC_delay();
+ 125   1        if(IIC_SDA)//´Ó»ú»Ø¸´·ÇÓ¦´ðÐÅºÅ
+ 126   1        {
+ 127   2          IIC_SCL = 0;//SCL = 0
+ 128   2          IIC_SDA = 0;//SDA = 0
+ 129   2          return false;//´Ó»ú½ÓÊÕ´ËÖ¡Êý¾ÝÊ§°Ü
+ 130   2        }
+ 131   1        else //´Ó»ú»Ø¸´Ó¦´ðÐÅºÅ
+ 132   1        {
+ 133   2          IIC_SDA = 0;//SDA = 0
+ 134   2          IIC_SCL = 0;//SCL = 0
+ 135   2          return true;//´Ó»ú½ÓÊÕ´ËÖ¡Êý¾Ý³É¹¦
+ 136   2        }
+ 137   1      }
+ 138          
+ 139          /*!
+ 140           *  @brief    IICÖ÷»ú·¢ËÍ8Î»Êý¾Ý
+ 141           *  @param    
+ 142           *  @warning  ÔÚIICÐ­ÒéÄÚ²¿µÄÄ³8¸öÐÅºÅÇý¶¯
+ 143                        ¸Ãº¯ÊýÎªIICÐ­Òé²ã£¬²»¿É¸Ä¶¯(ÒÑÓÅ»¯ÔÚÈ·±£°²È«ÎÈ¶¨µÄÇ°ÌáÏÂ´úÂë×î¼ò»¯¡¢Õ¼ÓÃCPUÊ±¼ä×îÐ¡»¯)£¬²»¿É
+             -Íâ²¿µ÷ÓÃ
+ 144           *  @Sampleusage: IIC_SendByte(0x88)
+ 145           */
+ 146          
+ 147          void IIC_SendByte(uint8 x)
+ 148          {
+ 149   1        uint8 n=8;
+ 150   1        while(n--)
+ 151   1        {
+ 152   2          IIC_SCL = 0;//SCL = 0
+ 153   2          IIC_SDA = x & 0x80;//×¼±¸·¢ËÍÒ»¸öÎ»µÄÊý¾Ý
+ 154   2          x <<= 1;
+ 155   2          IIC_delay();
+ 156   2          IIC_SCL = 1;//SCL = 1
+ 157   2          IIC_delay();
+ 158   2        }
+ 159   1        IIC_SCL = 0;//SCL = 0
+ 160   1      }
+ 161          
+ 162          /*!
+ 163           *  @brief    IICÖ÷»ú½ÓÊÕ8Î»Êý¾Ý
+ 164           *  @param    
+ 165           *  @warning  ÔÚIICÐ­ÒéÄÚ²¿µÄÄ³8¸öÐÅºÅÇý¶¯
+ 166                        ¸Ãº¯ÊýÎªIICÐ­Òé²ã£¬²»¿É¸Ä¶¯(ÒÑÓÅ»¯ÔÚÈ·±£°²È«ÎÈ¶¨µÄÇ°ÌáÏÂ´úÂë×î¼ò»¯¡¢Õ¼ÓÃCPUÊ±¼ä×îÐ¡»¯)£¬²»¿É
+             -Íâ²¿µ÷ÓÃ
+C51 COMPILER V9.54   STC_SOFT_IIC                                                          08/14/2018 15:34:00 PAGE 4   
+
+ 167           *  @Sampleusage: IIC_ReceiveByte();
+ 168           */
+ 169          
+ 170          uint8 IIC_ReceiveByte(void)
+ 171          {
+ 172   1        uint8 n=8 , byte=0;
+ 173   1        IIC_SDA = 1;//SDA = 1
+ 174   1        while(n--)
+ 175   1        {
+ 176   2          byte <<= 1;
+ 177   2          IIC_SCL = 0;//SCL = 0
+ 178   2          IIC_delay();
+ 179   2          IIC_SCL = 1;//SCL = 1
+ 180   2          IIC_delay();
+ 181   2          byte |= IIC_SDA;
+ 182   2        }
+ 183   1        IIC_SCL = 0;//SCL = 0
+ 184   1        return byte;
+ 185   1      }
+ 186          
+ 187          /*!
+ 188           *  @brief    IICÖ÷»úµÈ´ý´Ó»ú×¼±¸ºÃÊý¾Ý£¬²¢½ÓÊÕ´Ó»ú·¢¹ýÀ´µÄ8Î»Êý¾Ý
+ 189           *  @param    
+ 190           *  @warning  ÔÚIICÐ­ÒéÄÚ²¿µÄÄ³8¸öÐÅºÅÇý¶¯
+ 191                        ¸Ãº¯ÊýÎªIICÐ­Òé²ã£¬²»¿É¸Ä¶¯(ÒÑÓÅ»¯ÔÚÈ·±£°²È«ÎÈ¶¨µÄÇ°ÌáÏÂ´úÂë×î¼ò»¯¡¢Õ¼ÓÃCPUÊ±¼ä×îÐ¡»¯)£¬²»¿É
+             -Íâ²¿µ÷ÓÃ
+ 192           *  @Sampleusage: IIC_Wait_ReceiveByte();
+ 193           */
+ 194          
+ 195          uint8 IIC_Wait_ReceiveByte(void)
+ 196          {
+ 197   1        uint8 n=7 , byte=0;
+ 198   1        IIC_SDA = 1;//SDA = 1
+ 199   1        IIC_SCL = 0;//SCL = 0
+ 200   1        IIC_delay();
+ 201   1        IIC_SCL = 1;//SCL = 1
+ 202   1        while(!IIC_SCL);//µÈ´ý´Ó»ú×¼±¸ºÃÒª·¢ËÍµÄÊý¾Ý(²Ù×÷Îª¼ì²â´Ó»úÊÍ·ÅSCLÏß)
+ 203   1        IIC_delay();
+ 204   1        byte |= IIC_SDA;
+ 205   1        while(n--)
+ 206   1        {
+ 207   2          byte <<= 1;
+ 208   2          IIC_SCL = 0;//SCL = 0
+ 209   2          IIC_delay();
+ 210   2          IIC_SCL = 1;//SCL = 1
+ 211   2          IIC_delay();
+ 212   2          byte |= IIC_SDA;
+ 213   2        }
+ 214   1        IIC_SCL = 0;//SCL = 0
+ 215   1        return byte;
+ 216   1      }
+ 217          
+ 218          /*!
+ 219           *  @brief    ÏòIIC´Ó»ú·¢ËÍÐ´¼Ä´æÆ÷Êý¾ÝÖ¸Áî
+ 220           *  @param    addr  ´Ó»úµØÖ·
+ 221                        reg   ÐèÒª²Ù×÷µÄ¼Ä´æÆ÷µØÖ·
+ 222                        Data  ÐèÒªÐ´Èë´Ó»úµÄÊý¾Ý
+ 223           *  @warning  addrÎª´ÓÉè±¸µÄ7bitµØÖ·ÓÃÊ®Áù½øÖÆ±íÊ¾
+ 224                        ¸Ãº¯ÊýÖ»ÄÜÐ´Ò»¸ö×Ö½ÚµÄÊý¾Ý£¬½áÊøºó»á·¢ËÍIIC½áÊøÐÅºÅ£¬¹Ê²»ÄÜ·¢ËÍ¶à×Ö½ÚÊý¾Ý
+ 225                        ¸Ãº¯ÊýÓÐ·µ»ØÖµ¿ÉÅÐ¶¨Ð´1¸ö×Ö½Ú²Ù×÷ÊÇ·ñ³É¹¦£¬0-Ê§°Ü¡¢1-³É¹¦
+ 226           *  @Sampleusage: IIC_Write_Reg(0x1e , 0x00 , 0x10);
+ 227           */
+C51 COMPILER V9.54   STC_SOFT_IIC                                                          08/14/2018 15:34:00 PAGE 5   
+
+ 228          
+ 229          bool IIC_Write_Reg(uint8 addr , uint8 reg , uint8 Data)
+ 230          {
+ 231   1        if (!IIC_Start()) return false;
+ 232   1        IIC_SendByte(addr << 1 | IIC_Direction_Transmitter);
+ 233   1        if (!IIC_GetAck())
+ 234   1        {
+ 235   2          IIC_Stop();
+ 236   2          return false;
+ 237   2        }
+ 238   1        IIC_SendByte(reg);
+ 239   1        if (!IIC_GetAck())
+ 240   1        {
+ 241   2          IIC_Stop();
+ 242   2          return false;
+ 243   2        }
+ 244   1        IIC_SendByte(Data);
+ 245   1        if (!IIC_GetAck())
+ 246   1        {
+ 247   2          IIC_Stop();
+ 248   2          return false;
+ 249   2        }
+ 250   1        IIC_Stop();
+ 251   1        return true;
+ 252   1      }
+ 253          
+ 254          /*!
+ 255           *  @brief    ÏòIIC´Ó»úË÷Òª¼Ä´æÆ÷Êý¾ÝÖ¸Áî
+ 256           *  @param    addr  ´Ó»úµØÖ·
+ 257                        reg   ÐèÒª²Ù×÷µÄ¼Ä´æÆ÷µØÖ·
+ 258           *  @warning  addrÎª´ÓÉè±¸µÄ7bitµØÖ·ÓÃÊ®Áù½øÖÆ±íÊ¾
+ 259                        ¸Ãº¯ÊýÖ»ÄÜ¶ÁÒ»¸ö×Ö½ÚµÄÊý¾Ý£¬½áÊøºó»á·¢ËÍIIC½áÊøÐÅºÅ£¬¹Ê²»ÄÜ½ÓÊÕ¶à×Ö½ÚÊý¾Ý
+ 260                        ×¢Òâ£º¸Ãº¯ÊýÃ»ÓÐ¾À´íÄÜÁ¦£¬¹Ê²»ÄÜµÃÖª¶Á²Ù×÷ËùµÃÊý¾ÝÊÇ·ñÕýÈ·£¬ËùÓÐ×ÜÏß²Ù×÷ÊôÓÚ¿ª»·²Ù×÷£¬ÕâÑù×ö
+             -¿É´ó´óÌáÉý¶ÁÈ¡ËÙ¶È
+ 261           *  @Sampleusage: IIC_Read_Reg(0x1e , 0x00);
+ 262           */
+ 263          
+ 264          uint8 IIC_Read_Reg(uint8 addr , uint8 reg)
+ 265          {
+ 266   1        uint8 Data=0;
+ 267   1        IIC_Start();
+ 268   1        IIC_SendByte(addr << 1 | IIC_Direction_Transmitter);
+ 269   1        IIC_GetAck();
+ 270   1        IIC_SendByte(reg);
+ 271   1        IIC_GetAck();
+ 272   1        IIC_Stop();
+ 273   1        IIC_Start();
+ 274   1        IIC_SendByte(addr << 1 | IIC_Direction_Receiver);
+ 275   1        IIC_GetAck();
+ 276   1        Data = IIC_Wait_ReceiveByte();
+ 277   1        IIC_NoAck();
+ 278   1        IIC_Stop();
+ 279   1        return Data;
+ 280   1      }
+ 281          
+ 282          /*!
+ 283           *  @brief    ÏòÄ³¸öIICÆ÷¼þµÄÄ³¸ö¼Ä´æÆ÷¿ªÊ¼(¼Ä´æÆ÷µØÖ·×î´óÖ§³Ö32Î»¿í)ÌîÈëÒ»×éÊý¾Ý(Êý¾ÝÁ÷³¤¶È×î´óÖ§³Ö255×Ö½Ú)
+ 284           *  @param    addr     IICÆ÷¼þÎïÀíµØÖ·
+ 285                        reg_wide ¼Ä´æÆ÷µØÖ·Î»¿í(¿ÉÑ¡Î»¿í: bit_wide_8 , bit_wide_16 , bit_wide_32)
+ 286                        reg      ¶ÔÓ¦Î»¿íµÄ¼Ä´æÆ÷µØÖ·
+ 287                        len      Òª·¢ËÍµÄÊý¾ÝÁ÷³¤¶È(µ¥Î»:×Ö½Ú)
+ 288                        *Data    Êý¾ÝÁ÷Êý×éÊ×µØÖ·(ÒÔÈ¡µØÖ··ûºÅ&´«Èëº¯Êý)
+C51 COMPILER V9.54   STC_SOFT_IIC                                                          08/14/2018 15:34:00 PAGE 6   
+
+ 289           *  @warning  Èô¼Ä´æÆ÷Î»¿íÓëÌîÈëµÄ¼Ä´æÆ÷µØÖ·²»·û£¬Ôò°´ÕÕÉèÖÃµÄÎ»¿íÈ¡µÍÎ»²à·¢ËÍ£¬´ËÊ±IICÆ÷¼þ½«¹¤×÷ÎÉÂÒ
+ 290                        ×¢ÒâÊý¾ÝÁ÷³¤¶ÈÓëÊý¾ÝÁ÷Êý×é³¤¶ÈµÄÆ¥Åä£¬±ØÒªÊ±¿ÉÊ¹ÓÃsizeof()º¯Êý¼ì²â´«Èë
+ 291           *  @Sampleusage: IIC_Write(0x44 , bit_wide_8 , 0x20 , 1 , &Data);
+ 292           */
+ 293          
+ 294          bool IIC_Write(uint8 addr , bit_wide reg_wide , uint32 reg , uint8 len , uint8 *Data)
+ 295          {
+ 296   1        if (!IIC_Start()) return false;
+ 297   1        IIC_SendByte(addr << 1 | IIC_Direction_Transmitter);
+ 298   1        if (!IIC_GetAck())
+ 299   1        {
+ 300   2          IIC_Stop();
+ 301   2          return false;
+ 302   2        }
+ 303   1        while(reg_wide--)
+ 304   1        {
+ 305   2          IIC_SendByte(reg >> (8*reg_wide) & 0xff);
+ 306   2          if (!IIC_GetAck())
+ 307   2          {
+ 308   3            IIC_Stop();
+ 309   3            return false;
+ 310   3          }
+ 311   2        }
+ 312   1        while(len--)
+ 313   1        {
+ 314   2          IIC_SendByte(*Data++);
+ 315   2          if (!IIC_GetAck())
+ 316   2          {
+ 317   3            IIC_Stop();
+ 318   3            return false;
+ 319   3          }
+ 320   2        }
+ 321   1        IIC_Stop();
+ 322   1        return true;
+ 323   1      }
+ 324          
+ 325          /*!
+ 326           *  @brief    ÏòÄ³¸öIICÆ÷¼þµÄÄ³¸ö¼Ä´æÆ÷¿ªÊ¼(¼Ä´æÆ÷µØÖ·×î´óÖ§³Ö32Î»¿í)½ÓÊÕÒ»×éÊý¾Ý(Êý¾ÝÁ÷³¤¶È×î´óÖ§³Ö255×Ö½Ú)
+ 327           *  @param    addr     IICÆ÷¼þÎïÀíµØÖ·
+ 328                        reg_wide ¼Ä´æÆ÷µØÖ·Î»¿í(¿ÉÑ¡Î»¿í: bit_wide_8 , bit_wide_16 , bit_wide_32)
+ 329                        reg      ¶ÔÓ¦Î»¿íµÄ¼Ä´æÆ÷µØÖ·
+ 330                        len      Òª½ÓÊÕµÄÊý¾ÝÁ÷³¤¶È(µ¥Î»:×Ö½Ú)
+ 331                        *Data    Êý¾ÝÁ÷Êý×éÊ×µØÖ·(ÒÔÈ¡µØÖ··ûºÅ&´«Èëº¯Êý)
+ 332                        º¯ÊýÊµÌåµÚÒ»ÐÐnÎª´Ó»ú»Ø¸´NoAckÖØÊÔ´ÎÊý£¬Ã»ÓÐ³öÏÖÔÚÊäÈë²ÎÊýÖÐ£¬ÒòÎªËü²¢²»³£ÓÃ£¬µ«¿É¸ù¾ÝÆ÷¼þÏì
+             -Ó¦ËÙ¶ÈÓë±¾º¯ÊýÄÚÖØÊÔÑ­»·²¿·ÖËùÓÃÊ±¼ä½øÐÐµ÷Õû
+ 333           *  @warning  Èô¼Ä´æÆ÷Î»¿íÓëÌîÈëµÄ¼Ä´æÆ÷µØÖ·²»·û£¬Ôò°´ÕÕÉèÖÃµÄÎ»¿íÈ¡µÍÎ»²à·¢ËÍ£¬´ËÊ±IICÆ÷¼þ½«¹¤×÷ÎÉÂÒ
+ 334                        ×¢ÒâÊý¾ÝÁ÷³¤¶ÈÓëÊý¾ÝÁ÷Êý×é³¤¶ÈµÄÆ¥Åä£¬¾ßÌå³¤¶ÈÓ¦²é¿´IICÆ÷¼þÊÖ²á£¡
+ 335           *  @Sampleusage: IIC_Read(0x44 , bit_wide_16 , 0x2c06 , 6 , &BUF);
+ 336           */
+ 337          
+ 338          bool IIC_Read(uint8 addr , bit_wide reg_wide , uint32 reg , uint8 len , uint8 *buf)
+ 339          {
+ 340   1        uint8 n=10;//´Ó»ú»Ø¸´NoAckÖØÊÔ´ÎÊý
+ 341   1        if (!IIC_Start()) return false;
+ 342   1        IIC_SendByte(addr << 1 | IIC_Direction_Transmitter);
+ 343   1        if (!IIC_GetAck())
+ 344   1        {
+ 345   2          IIC_Stop();
+ 346   2          return false;
+ 347   2        }
+ 348   1        while(reg_wide--)
+ 349   1        {
+C51 COMPILER V9.54   STC_SOFT_IIC                                                          08/14/2018 15:34:00 PAGE 7   
+
+ 350   2          IIC_SendByte(reg >> (8*reg_wide) & 0xff);
+ 351   2          if (!IIC_GetAck())
+ 352   2          {
+ 353   3            IIC_Stop();
+ 354   3            return false;
+ 355   3          }
+ 356   2        }
+ 357   1        IIC_Stop();
+ 358   1        while(n--)
+ 359   1        {
+ 360   2          if (!IIC_Start()) return false;
+ 361   2          IIC_SendByte(addr << 1 | IIC_Direction_Receiver);
+ 362   2          if (IIC_GetAck()) break;
+ 363   2          else IIC_Stop();
+ 364   2        }
+ 365   1        if(n==0) return false;
+ 366   1        *buf++ = IIC_Wait_ReceiveByte();
+ 367   1        len--;
+ 368   1        while(len--)
+ 369   1        {
+ 370   2          IIC_Ack();
+ 371   2          *buf++ = IIC_ReceiveByte();
+ 372   2        }
+ 373   1        IIC_NoAck();
+ 374   1        IIC_Stop();
+ 375   1        return true;
+ 376   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    697    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----      21
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+   EDATA SIZE       =   ----    ----
+   HDATA SIZE       =   ----    ----
+   XDATA CONST SIZE =   ----    ----
+   FAR CONST SIZE   =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

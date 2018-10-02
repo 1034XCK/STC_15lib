@@ -1,0 +1,175 @@
+C51 COMPILER V9.54   STC_DS18B20                                                           08/14/2018 15:33:57 PAGE 1   
+
+
+C51 COMPILER V9.54, COMPILATION OF MODULE STC_DS18B20
+OBJECT MODULE PLACED IN .\Prj\KEIL\STC15_Debug\Obj\STC_DS18B20.obj
+COMPILER INVOKED BY: E:\program files\Keil C51 v5\C51\BIN\C51.EXE Board\src\STC_DS18B20.c LARGE OMF2 OPTIMIZE(9,SPEED) R
+                    -EGFILE(.\Prj\KEIL\STC15_Debug\Obj\雪之澜_STC单片机库_v2.ORC) BROWSE MODP2 INCDIR(..\文档;.\App\Inc;.\Board\inc;.\Chip\In
+                    -c;.\Chip\Inc\kinetis) DEBUG PRINT(.\Prj\KEIL\STC15_Debug\List\STC_DS18B20.lst) TABS(2) OBJECT(.\Prj\KEIL\STC15_Debug\Obj
+                    -\STC_DS18B20.obj)
+
+line level    source
+
+   1          #include "common.h"
+   2          #include "STC_DS18B20.h"
+   3          #include "STC_gpio.h"
+   4          
+   5          /*!
+   6           *  @brief    初始化DS18B20
+   7           *  @param    返回值为初始化成功与否
+   8                        返回0：初始化失败
+   9                        返回1：初始化成功
+  10           *  @warning  
+  11           *  @sampleusage: a=init_DS18B20(p12);
+  12           */
+  13           
+  14          bit init_DS18B20(pxn_e DS18B20_DQ)
+  15          {
+  16   1        uint8 delay_num=0;//等待回复信号时间计数
+  17   1        gpio_init(DS18B20_DQ , STRONGPULLUP , 1);
+  18   1        gpio_set(DS18B20_DQ , 0);
+  19   1        DELAY_US(500);
+  20   1        gpio_set(DS18B20_DQ , 1);
+  21   1        DELAY_US(60);
+  22   1        while(gpio_get(DS18B20_DQ) && delay_num<100)  delay_num++;
+  23   1        if(delay_num==100)  delay_num=0;//返回delay_nuum=0,初始化失败
+  24   1        else  delay_num=1;////返回delay_nuum=1,初始化成功
+  25   1        DELAY_US(240);
+  26   1        return delay_num;
+  27   1      }
+  28          
+  29          /*!
+  30           *  @brief    写一个字节到DS18B20
+  31           *  @param    dat 要写入得1字节数据
+  32           *  @warning  
+  33           *  @sampleusage: DS18B20_write_byte(p12,0xcc);//向DS18B20写入0xcc
+  34           */
+  35          
+  36          void DS18B20_write_byte(pxn_e DS18B20_DQ , uint8 dat)
+  37          {
+  38   1        uint8 i=0;
+  39   1        for(i=0;i<8;i++)
+  40   1        {
+  41   2          gpio_set(DS18B20_DQ , 0);
+  42   2          DELAY_US(10);
+  43   2          gpio_set(DS18B20_DQ , BIT_GET(dat,i));//从低位开始发送
+  44   2          DELAY_US(50);
+  45   2          gpio_set(DS18B20_DQ , 1);
+  46   2          DELAY_US(2);
+  47   2        }
+  48   1      }
+  49          
+  50          /*!
+  51           *  @brief    从DS18B20读一个字节
+  52           *  @param    返回值为读取一个字节所得到的数据
+C51 COMPILER V9.54   STC_DS18B20                                                           08/14/2018 15:33:57 PAGE 2   
+
+  53           *  @warning  
+  54           *  @sampleusage: a=DS18B20_read_byte(p12);
+  55           */
+  56          
+  57          uint8 DS18B20_read_byte(pxn_e DS18B20_DQ)
+  58          {
+  59   1        uint8 i=0 , dat , dat_bit0=0 , dat_bit1=0 , dat_bit2=0;
+  60   1        for(i=0;i<8;i++)
+  61   1        {
+  62   2          gpio_set(DS18B20_DQ , 0);
+  63   2          DELAY_US(1);
+  64   2          gpio_set(DS18B20_DQ , 1);
+  65   2          DELAY_US(10);
+  66   2          dat_bit0 = gpio_get(DS18B20_DQ);//取三选二法，排除干扰
+  67   2          dat_bit1 = gpio_get(DS18B20_DQ);
+  68   2          dat_bit2 = gpio_get(DS18B20_DQ);
+  69   2          if(dat_bit0+dat_bit1+dat_bit2 > 1)//此位为“1”
+  70   2            BIT_SET(dat,i);
+  71   2          else //此位为“0”
+  72   2            BIT_CLR(dat,i);
+  73   2          DELAY_US(50);
+  74   2        }
+  75   1        return dat;
+  76   1      }
+  77          
+  78          /*!
+  79           *  @brief    读一个器件的12位精度的温度值
+  80           *  @param    返回值为摄氏度的100倍
+  81                        如：返回2513，则实际温度为25.13℃
+  82           *  @warning  两次获取时间间隔需大于800ms
+  83           *  @sampleusage: a=DS18B20_read_temperature(p12);
+  84           */
+  85          
+  86          int16 DS18B20_read_temperature(pxn_e DS18B20_DQ)
+  87          {
+  88   1        uint8 init_state=0 , dat0=0 , dat1=0 , dat2=0 , dat3=0 , dat4=0 , dat5=0 , dat6=0 , dat7=0 , dat8=0;
+  89   1        
+  90   1        while(init_state!=0xff && init_state < 4)
+  91   1        {
+  92   2          if(init_DS18B20(DS18B20_DQ))//初始化成功
+  93   2            init_state=0xff;
+  94   2          else
+  95   2            init_state++;
+  96   2        }
+  97   1        if(init_state==4)return 0xffff;//读取失败（初始化失败）
+  98   1        init_state=0;
+  99   1        
+ 100   1        DS18B20_write_byte(DS18B20_DQ , 0xcc);//跳过ROM
+ 101   1        DS18B20_write_byte(DS18B20_DQ , 0x4e);//写暂存器，3个字节
+ 102   1        DS18B20_write_byte(DS18B20_DQ , 0x00);//写暂存器
+ 103   1        DS18B20_write_byte(DS18B20_DQ , 0x00);//写暂存器
+ 104   1        DS18B20_write_byte(DS18B20_DQ , 0x7f);//写暂存器
+ 105   1        
+ 106   1        while(init_state!=0xff && init_state < 4)
+ 107   1        {
+ 108   2          if(init_DS18B20(DS18B20_DQ))//初始化成功
+ 109   2            init_state=0xff;
+ 110   2          else
+ 111   2            init_state++;
+ 112   2        }
+ 113   1        if(init_state==4)return 0xffff;//读取失败（初始化失败）
+ 114   1        init_state=0;
+C51 COMPILER V9.54   STC_DS18B20                                                           08/14/2018 15:33:57 PAGE 3   
+
+ 115   1        
+ 116   1        DS18B20_write_byte(DS18B20_DQ , 0xcc);//跳过ROM
+ 117   1        DS18B20_write_byte(DS18B20_DQ , 0x44);//开始转化换
+ 118   1        
+ 119   1        while(init_state!=0xff && init_state < 4)
+ 120   1        {
+ 121   2          if(init_DS18B20(DS18B20_DQ))//初始化成功
+ 122   2            init_state=0xff;
+ 123   2          else
+ 124   2            init_state++;
+ 125   2        }
+ 126   1        if(init_state==4)return 0xffff;//读取失败（初始化失败）
+ 127   1        init_state=0;
+ 128   1        
+ 129   1        DS18B20_write_byte(DS18B20_DQ , 0xcc);//跳过ROM
+ 130   1        DS18B20_write_byte(DS18B20_DQ , 0xbe);//写开始读寄存器
+ 131   1        dat0 = DS18B20_read_byte(DS18B20_DQ);//温度低字节
+ 132   1        dat1 = DS18B20_read_byte(DS18B20_DQ);//温度高字节
+ 133   1        dat2 = DS18B20_read_byte(DS18B20_DQ);//警报预警值高字节
+ 134   1        dat3 = DS18B20_read_byte(DS18B20_DQ);//警报预警值低字节
+ 135   1        dat4 = DS18B20_read_byte(DS18B20_DQ);//精度配置寄存器
+ 136   1        dat5 = DS18B20_read_byte(DS18B20_DQ);
+ 137   1        dat6 = DS18B20_read_byte(DS18B20_DQ);
+ 138   1        dat7 = DS18B20_read_byte(DS18B20_DQ);
+ 139   1        dat8 = DS18B20_read_byte(DS18B20_DQ);//CRC校验值
+ 140   1        return (((uint16)(dat1)<<8)|dat0)*50L/8;
+ 141   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    640    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----      13
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+   EDATA SIZE       =   ----    ----
+   HDATA SIZE       =   ----    ----
+   XDATA CONST SIZE =   ----    ----
+   FAR CONST SIZE   =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

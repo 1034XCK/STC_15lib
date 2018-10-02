@@ -1,0 +1,411 @@
+C51 COMPILER V9.54   STC_GPIO                                                              08/14/2018 15:33:58 PAGE 1   
+
+
+C51 COMPILER V9.54, COMPILATION OF MODULE STC_GPIO
+OBJECT MODULE PLACED IN .\Prj\KEIL\STC15_Debug\Obj\STC_gpio.obj
+COMPILER INVOKED BY: E:\program files\Keil C51 v5\C51\BIN\C51.EXE Chip\src\STC_gpio.c LARGE OMF2 OPTIMIZE(9,SPEED) REGFI
+                    -LE(.\Prj\KEIL\STC15_Debug\Obj\Ñ©Ö®À½_STCµ¥Æ¬»ú¿â_v2.ORC) BROWSE MODP2 INCDIR(..\ÎÄµµ;.\App\Inc;.\Board\inc;.\Chip\Inc;.\
+                    -Chip\Inc\kinetis) DEBUG PRINT(.\Prj\KEIL\STC15_Debug\List\STC_gpio.lst) TABS(2) OBJECT(.\Prj\KEIL\STC15_Debug\Obj\STC_gp
+                    -io.obj)
+
+line level    source
+
+   1          /*
+   2           * °üº¬Í·ÎÄ¼þ
+   3           */
+   4          #include "common.h"
+   5          #include "STC_gpio.h"
+   6          
+   7          /*!
+   8           *  @brief    ³õÊ¼»¯µ¥¸ögpio¿Ú
+   9           *  @param    pxn       IO¿Ú
+  10           *  @param    mode      ¹¤×÷Ä£Ê½£º
+  11           *                                WEAKPULLUP    //ÈõÉÏÀ­Ë«Ïò¿Ú¡¾ÊäÈë×´Ì¬ËùÐèµçÁ÷£ºIO=1->0Ðè15uA,IO=0->1Ðè>50mA£»Êä³ö×´Ì¬Ìá¹©
+             -µçÁ÷·´Ö®¡¿
+  12           *                                STRONGPULLUP  //Ç¿ÉÏÀ­Ë«Ïò¿Ú¡¾´ËÄ£Ê½Ç¿ÁÒ½¨Òé½öÊä³ö£¬µ«¿ÉÒÔÓÃÀ´ÊäÈë£¬ÊäÈë×´Ì¬ËùÐèµçÁ÷£ºIO=
+             -1->0Ðè>25mA,IO=0->1Ðè>50mA£»Êä³ö×´Ì¬Ìá¹©µçÁ÷·´Ö®¡¿
+  13           *                                FLOATEDINPUT  //¸¡¿ÕÊäÈë¡¾½öÖ§³ÖÊäÈë×´Ì¬£¬ÇÒÊäÈëËùÐèµçÁ÷¼¸ºõÎª0A£¬IO¿Ú³Ê¸ß×èÌ¬ËùÒÔÎÞÊä³ö×
+             -´Ì¬¡¿
+  14           *                                DRAIN_OPEN    //¿ªÂ©Ë«Ïò¿Ú¡¾ÊäÈë×´Ì¬ËùÐèµçÁ÷£ºIO=1->0Ðè0A,IO=0->1Ðè>50mA£»Êä³ö×´Ì¬Ìá¹©µçÁ÷
+             -·´Ö®¡¿
+  15           *  @param    level_state ³õÊ¼µçÆ½£¬0=µÍµçÆ½£¬1=¸ßµçÆ½  £¨¶ÔÊäÈëÄ£Ê½ÎÞÐ§£©
+  16           *  @warning  ´®¿ÚËùÔÚÒý½ÅµÄIO¿ÚÄ£Ê½²»ÄÜÎªÇ¿ÉÏÀ­Ë«Ïò¿Ú
+  17           *  @Sampleusage: gpio_init(p25, STRONGPULLUP, 0);
+  18           */
+  19          void gpio_init(pxn_e pxn,  port_mode mode,  uint8 level_state)//³õÊ¼»¯GPIOÒý½Å(ÄÄ¸öÒý½Å£¬Ê²Ã´Ä£Ê½£¬³õÊ¼µçÆ
+             -½)
+  20          {
+  21   1        switch(px(pxn))
+  22   1        {
+  23   2          case 0 :
+  24   2            //ÉèÖÃP0M0ÓëP0M1À´¿ØÖÆIO¿ÚÄ£Ê½
+  25   2            if(BIT_GET(mode,0)) BIT_SET(P0M0,pn(pxn));else BIT_CLR(P0M0,pn(pxn));
+  26   2            if(BIT_GET(mode,1)) BIT_SET(P0M1,pn(pxn));else BIT_CLR(P0M1,pn(pxn));
+  27   2            //IO¿ÚÊä³öÊý¾Ý
+  28   2            if(level_state)     BIT_SET(P0,pn(pxn));  else BIT_CLR(P0,pn(pxn));
+  29   2            break;
+  30   2          case 1 :
+  31   2            if(BIT_GET(mode,0)) BIT_SET(P1M0,pn(pxn));else BIT_CLR(P1M0,pn(pxn));
+  32   2            if(BIT_GET(mode,1)) BIT_SET(P1M1,pn(pxn));else BIT_CLR(P1M1,pn(pxn));
+  33   2            if(level_state)     BIT_SET(P1,pn(pxn));  else BIT_CLR(P1,pn(pxn));
+  34   2            break;
+  35   2          case 2 :
+  36   2            if(BIT_GET(mode,0)) BIT_SET(P2M0,pn(pxn));else BIT_CLR(P2M0,pn(pxn));
+  37   2            if(BIT_GET(mode,1)) BIT_SET(P2M1,pn(pxn));else BIT_CLR(P2M1,pn(pxn));
+  38   2            if(level_state)     BIT_SET(P2,pn(pxn));  else BIT_CLR(P2,pn(pxn));
+  39   2            break;
+  40   2          case 3 :
+  41   2            if(BIT_GET(mode,0)) BIT_SET(P3M0,pn(pxn));else BIT_CLR(P3M0,pn(pxn));
+  42   2            if(BIT_GET(mode,1)) BIT_SET(P3M1,pn(pxn));else BIT_CLR(P3M1,pn(pxn));
+  43   2            if(level_state)     BIT_SET(P3,pn(pxn));  else BIT_CLR(P3,pn(pxn));
+  44   2            break;
+  45   2          case 4 :
+  46   2            if(BIT_GET(mode,0)) BIT_SET(P4M0,pn(pxn));else BIT_CLR(P4M0,pn(pxn));
+  47   2            if(BIT_GET(mode,1)) BIT_SET(P4M1,pn(pxn));else BIT_CLR(P4M1,pn(pxn));
+C51 COMPILER V9.54   STC_GPIO                                                              08/14/2018 15:33:58 PAGE 2   
+
+  48   2            if(level_state)     BIT_SET(P4,pn(pxn));  else BIT_CLR(P4,pn(pxn));
+  49   2            break;
+  50   2          case 5 :
+  51   2            if(BIT_GET(mode,0)) BIT_SET(P5M0,pn(pxn));else BIT_CLR(P5M0,pn(pxn));
+  52   2            if(BIT_GET(mode,1)) BIT_SET(P5M1,pn(pxn));else BIT_CLR(P5M1,pn(pxn));
+  53   2            if(level_state)     BIT_SET(P5,pn(pxn));  else BIT_CLR(P5,pn(pxn));
+  54   2            break;
+  55   2          case 6 :
+  56   2            if(BIT_GET(mode,0)) BIT_SET(P6M0,pn(pxn));else BIT_CLR(P6M0,pn(pxn));
+  57   2            if(BIT_GET(mode,1)) BIT_SET(P6M1,pn(pxn));else BIT_CLR(P6M1,pn(pxn));
+  58   2            if(level_state)     BIT_SET(P6,pn(pxn));  else BIT_CLR(P6,pn(pxn));
+  59   2            break;
+  60   2          case 7 :
+  61   2            if(BIT_GET(mode,0)) BIT_SET(P7M0,pn(pxn));else BIT_CLR(P7M0,pn(pxn));
+  62   2            if(BIT_GET(mode,1)) BIT_SET(P7M1,pn(pxn));else BIT_CLR(P7M1,pn(pxn));
+  63   2            if(level_state)     BIT_SET(P7,pn(pxn));  else BIT_CLR(P7,pn(pxn));
+  64   2            break;
+  65   2          default:
+  66   2            ;//¶ÏÑÔ£¬´«µÝ¹Ü½Å²»´æÔÚ
+  67   2        }
+  68   1        
+  69   1      }
+  70          
+  71          /*!
+  72           *  @brief    ³õÊ¼»¯Ò»×égpio¶Ë¿Ú
+  73           *  @param    px        ¶Ë¿Ú
+  74           *  @param    mode      ¹¤×÷Ä£Ê½£º
+  75           *                                WEAKPULLUP    //ÈõÉÏÀ­Ë«Ïò¿Ú¡¾ÊäÈë×´Ì¬ËùÐèµçÁ÷£ºIO=1->0Ðè15uA,IO=0->1Ðè>50mA£»Êä³ö×´Ì¬Ìá¹©
+             -µçÁ÷·´Ö®¡¿
+  76           *                                STRONGPULLUP  //Ç¿ÉÏÀ­Ë«Ïò¿Ú¡¾´ËÄ£Ê½Ç¿ÁÒ½¨Òé½öÊä³ö£¬µ«¿ÉÒÔÓÃÀ´ÊäÈë£¬ÊäÈë×´Ì¬ËùÐèµçÁ÷£ºIO=
+             -1->0Ðè>25mA,IO=0->1Ðè>50mA£»Êä³ö×´Ì¬Ìá¹©µçÁ÷·´Ö®¡¿
+  77           *                                FLOATEDINPUT  //¸¡¿ÕÊäÈë¡¾½öÖ§³ÖÊäÈë×´Ì¬£¬ÇÒÊäÈëËùÐèµçÁ÷¼¸ºõÎª0A£¬IO¿Ú³Ê¸ß×èÌ¬ËùÒÔÎÞÊä³ö×
+             -´Ì¬¡¿
+  78           *                                DRAIN_OPEN    //¿ªÂ©Ë«Ïò¿Ú¡¾ÊäÈë×´Ì¬ËùÐèµçÁ÷£ºIO=1->0Ðè0A,IO=0->1Ðè>50mA£»Êä³ö×´Ì¬Ìá¹©µçÁ÷
+             -·´Ö®¡¿
+  79           *  @param    level_state ³õÊ¼Êý¾Ý    £¨¶ÔÊäÈëÄ£Ê½ÎÞÐ§£©
+  80           *  @warning  ´®¿ÚËùÔÚÒý½ÅµÄIO¿ÚÄ£Ê½²»ÄÜÎªÇ¿ÉÏÀ­Ë«Ïò¿Ú
+  81           *  @Sampleusage: gpio_group_init(p0, FLOATEDINPUT, 0x66);
+  82           */
+  83          void gpio_group_init(px_e px,  port_mode mode,  uint8 level_state)//³õÊ¼»¯Ò»×éGPIO¶Ë¿Ú(ÄÄ¸ö¶Ë¿Ú£¬Ê²Ã´Ä£Ê½£
+             -¬³õÊ¼Êý¾Ý)
+  84          {
+  85   1        switch(px)
+  86   1        {
+  87   2          case 0 :
+  88   2            //ÉèÖÃP0M0ÓëP0M1À´¿ØÖÆIO¿ÚÄ£Ê½
+  89   2            if(BIT_GET(mode,0))P0M0=0xff;else P0M0=0x00;
+  90   2            if(BIT_GET(mode,1))P0M1=0xff;else P0M1=0x00;
+  91   2            //¶Ë¿ÚÊä³öÊý¾Ý
+  92   2            P0=level_state;
+  93   2            break;
+  94   2          case 1 :
+  95   2            if(BIT_GET(mode,0))P1M0=0xff;else P1M0=0x00;
+  96   2            if(BIT_GET(mode,1))P1M1=0xff;else P1M1=0x00;
+  97   2            P1=level_state;
+  98   2            break;
+  99   2          case 2 :
+ 100   2            if(BIT_GET(mode,0))P2M0=0xff;else P2M0=0x00;
+ 101   2            if(BIT_GET(mode,1))P2M1=0xff;else P2M1=0x00;
+ 102   2            P2=level_state;
+ 103   2            break;
+ 104   2          case 3 :
+C51 COMPILER V9.54   STC_GPIO                                                              08/14/2018 15:33:58 PAGE 3   
+
+ 105   2            if(BIT_GET(mode,0))P3M0=0xff;else P3M0=0x00;
+ 106   2            if(BIT_GET(mode,1))P3M1=0xff;else P3M1=0x00;
+ 107   2            P3=level_state;
+ 108   2            break;
+ 109   2          case 4 :
+ 110   2            if(BIT_GET(mode,0))P4M0=0xff;else P4M0=0x00;
+ 111   2            if(BIT_GET(mode,1))P4M1=0xff;else P4M1=0x00;
+ 112   2            P4=level_state;
+ 113   2            break;
+ 114   2          case 5 :
+ 115   2            if(BIT_GET(mode,0))P5M0=0xff;else P5M0=0x00;
+ 116   2            if(BIT_GET(mode,1))P5M1=0xff;else P5M1=0x00;
+ 117   2            P5=level_state;
+ 118   2            break;
+ 119   2          case 6 :
+ 120   2            if(BIT_GET(mode,0))P6M0=0xff;else P6M0=0x00;
+ 121   2            if(BIT_GET(mode,1))P6M1=0xff;else P6M1=0x00;
+ 122   2            P6=level_state;
+ 123   2            break;
+ 124   2          case 7 :
+ 125   2            if(BIT_GET(mode,0))P7M0=0xff;else P7M0=0x00;
+ 126   2            if(BIT_GET(mode,1))P7M1=0xff;else P7M1=0x00;
+ 127   2            P7=level_state;
+ 128   2            break;
+ 129   2          
+ 130   2          default:
+ 131   2            ;//¶ÏÑÔ£¬´«µÝ¶Ë¿Ú²»´æÔÚ
+ 132   2        }
+ 133   1        
+ 134   1      }
+ 135          
+ 136          /*!
+ 137           *  @brief    ¸ü¸Ägpio¿Ú¹¤×÷Ä£Ê½
+ 138           *  @param    pxn       IO¿Ú
+ 139           *  @param    mode      ¹¤×÷Ä£Ê½£º
+ 140           *                                WEAKPULLUP    //ÈõÉÏÀ­Ë«Ïò¿Ú¡¾ÊäÈë×´Ì¬ËùÐèµçÁ÷£ºIO=1->0Ðè15uA,IO=0->1Ðè>50mA£»Êä³ö×´Ì¬Ìá¹©
+             -µçÁ÷·´Ö®¡¿
+ 141           *                                STRONGPULLUP  //Ç¿ÉÏÀ­Ë«Ïò¿Ú¡¾´ËÄ£Ê½Ç¿ÁÒ½¨Òé½öÊä³ö£¬µ«¿ÉÒÔÓÃÀ´ÊäÈë£¬ÊäÈë×´Ì¬ËùÐèµçÁ÷£ºIO=
+             -1->0Ðè>25mA,IO=0->1Ðè>50mA£»Êä³ö×´Ì¬Ìá¹©µçÁ÷·´Ö®¡¿
+ 142           *                                FLOATEDINPUT  //¸¡¿ÕÊäÈë¡¾½öÖ§³ÖÊäÈë×´Ì¬£¬ÇÒÊäÈëËùÐèµçÁ÷¼¸ºõÎª0A£¬IO¿Ú³Ê¸ß×èÌ¬ËùÒÔÎÞÊä³ö×
+             -´Ì¬¡¿
+ 143           *                                DRAIN_OPEN    //¿ªÂ©Ë«Ïò¿Ú¡¾ÊäÈë×´Ì¬ËùÐèµçÁ÷£ºIO=1->0Ðè0A,IO=0->1Ðè>50mA£»Êä³ö×´Ì¬Ìá¹©µçÁ÷
+             -·´Ö®¡¿
+ 144           *  @warning  ´®¿ÚËùÔÚÒý½ÅµÄIO¿ÚÄ£Ê½²»ÄÜÎªÇ¿ÉÏÀ­Ë«Ïò¿Ú
+ 145           *  @Sampleusage: gpio_mode(p25, FLOATEDINPUT);
+ 146           */
+ 147          void gpio_mode(pxn_e pxn,  port_mode mode)//ÉèÖÃGPIOÒý½Å¹¤×÷Ä£Ê½(ÄÄ¸öÒý½Å£¬Ê²Ã´Ä£Ê½)
+ 148          {
+ 149   1        switch(px(pxn))
+ 150   1        {
+ 151   2          case 0 :
+ 152   2            //ÉèÖÃP0M0ÓëP0M1À´¿ØÖÆIO¿ÚÄ£Ê½
+ 153   2            if(BIT_GET(mode,0)) BIT_SET(P0M0,pn(pxn));else BIT_CLR(P0M0,pn(pxn));
+ 154   2            if(BIT_GET(mode,1)) BIT_SET(P0M1,pn(pxn));else BIT_CLR(P0M1,pn(pxn));
+ 155   2            break;
+ 156   2          case 1 :
+ 157   2            if(BIT_GET(mode,0)) BIT_SET(P1M0,pn(pxn));else BIT_CLR(P1M0,pn(pxn));
+ 158   2            if(BIT_GET(mode,1)) BIT_SET(P1M1,pn(pxn));else BIT_CLR(P1M1,pn(pxn));
+ 159   2            break;
+ 160   2          case 2 :
+ 161   2            if(BIT_GET(mode,0)) BIT_SET(P2M0,pn(pxn));else BIT_CLR(P2M0,pn(pxn));
+ 162   2            if(BIT_GET(mode,1)) BIT_SET(P2M1,pn(pxn));else BIT_CLR(P2M1,pn(pxn));
+C51 COMPILER V9.54   STC_GPIO                                                              08/14/2018 15:33:58 PAGE 4   
+
+ 163   2            break;
+ 164   2          case 3 :
+ 165   2            if(BIT_GET(mode,0)) BIT_SET(P3M0,pn(pxn));else BIT_CLR(P3M0,pn(pxn));
+ 166   2            if(BIT_GET(mode,1)) BIT_SET(P3M1,pn(pxn));else BIT_CLR(P3M1,pn(pxn));
+ 167   2            break;
+ 168   2          case 4 :
+ 169   2            if(BIT_GET(mode,0)) BIT_SET(P4M0,pn(pxn));else BIT_CLR(P4M0,pn(pxn));
+ 170   2            if(BIT_GET(mode,1)) BIT_SET(P4M1,pn(pxn));else BIT_CLR(P4M1,pn(pxn));
+ 171   2            break;
+ 172   2          case 5 :
+ 173   2            if(BIT_GET(mode,0)) BIT_SET(P5M0,pn(pxn));else BIT_CLR(P5M0,pn(pxn));
+ 174   2            if(BIT_GET(mode,1)) BIT_SET(P5M1,pn(pxn));else BIT_CLR(P5M1,pn(pxn));
+ 175   2            break;
+ 176   2          case 6 :
+ 177   2            if(BIT_GET(mode,0)) BIT_SET(P6M0,pn(pxn));else BIT_CLR(P6M0,pn(pxn));
+ 178   2            if(BIT_GET(mode,1)) BIT_SET(P6M1,pn(pxn));else BIT_CLR(P6M1,pn(pxn));
+ 179   2            break;
+ 180   2          case 7 :
+ 181   2            if(BIT_GET(mode,0)) BIT_SET(P7M0,pn(pxn));else BIT_CLR(P7M0,pn(pxn));
+ 182   2            if(BIT_GET(mode,1)) BIT_SET(P7M1,pn(pxn));else BIT_CLR(P7M1,pn(pxn));
+ 183   2            break;
+ 184   2          default:
+ 185   2            ;//¶ÏÑÔ£¬´«µÝ¹Ü½Å²»´æÔÚ
+ 186   2        }
+ 187   1        
+ 188   1      }
+ 189          
+ 190          /*!
+ 191           *  @brief    ¸ü¸ÄÒ»×égpio¶Ë¿Ú¹¤×÷Ä£Ê½
+ 192           *  @param    px        ¶Ë¿Ú
+ 193           *  @param    mode      ¹¤×÷Ä£Ê½£º
+ 194           *                                WEAKPULLUP    //ÈõÉÏÀ­Ë«Ïò¿Ú¡¾ÊäÈë×´Ì¬ËùÐèµçÁ÷£ºIO=1->0Ðè15uA,IO=0->1Ðè>50mA£»Êä³ö×´Ì¬Ìá¹©
+             -µçÁ÷·´Ö®¡¿
+ 195           *                                STRONGPULLUP  //Ç¿ÉÏÀ­Ë«Ïò¿Ú¡¾´ËÄ£Ê½Ç¿ÁÒ½¨Òé½öÊä³ö£¬µ«¿ÉÒÔÓÃÀ´ÊäÈë£¬ÊäÈë×´Ì¬ËùÐèµçÁ÷£ºIO=
+             -1->0Ðè>25mA,IO=0->1Ðè>50mA£»Êä³ö×´Ì¬Ìá¹©µçÁ÷·´Ö®¡¿
+ 196           *                                FLOATEDINPUT  //¸¡¿ÕÊäÈë¡¾½öÖ§³ÖÊäÈë×´Ì¬£¬ÇÒÊäÈëËùÐèµçÁ÷¼¸ºõÎª0A£¬IO¿Ú³Ê¸ß×èÌ¬ËùÒÔÎÞÊä³ö×
+             -´Ì¬¡¿
+ 197           *                                DRAIN_OPEN    //¿ªÂ©Ë«Ïò¿Ú¡¾ÊäÈë×´Ì¬ËùÐèµçÁ÷£ºIO=1->0Ðè0A,IO=0->1Ðè>50mA£»Êä³ö×´Ì¬Ìá¹©µçÁ÷
+             -·´Ö®¡¿
+ 198           *  @warning  ´®¿ÚËùÔÚÒý½ÅµÄIO¿ÚÄ£Ê½²»ÄÜÎªÇ¿ÉÏÀ­Ë«Ïò¿Ú
+ 199           *  @Sampleusage: gpio_group_mode(p0, FLOATEDINPUT);
+ 200           */
+ 201          void gpio_group_mode(px_e px,  port_mode mode)//ÉèÖÃÒ»×éGPIO¶Ë¿Ú¹¤×÷Ä£Ê½(ÄÄ¸ö¶Ë¿Ú£¬Ê²Ã´Ä£Ê½)
+ 202          {
+ 203   1        switch(px)
+ 204   1        {
+ 205   2          case 0 :
+ 206   2            //ÉèÖÃP0M0ÓëP0M1À´¿ØÖÆIO¿ÚÄ£Ê½
+ 207   2            if(BIT_GET(mode,0))P0M0=0xff;else P0M0=0x00;
+ 208   2            if(BIT_GET(mode,1))P0M1=0xff;else P0M1=0x00;
+ 209   2            break;
+ 210   2          case 1 :
+ 211   2            if(BIT_GET(mode,0))P1M0=0xff;else P1M0=0x00;
+ 212   2            if(BIT_GET(mode,1))P1M1=0xff;else P1M1=0x00;
+ 213   2            break;
+ 214   2          case 2 :
+ 215   2            if(BIT_GET(mode,0))P2M0=0xff;else P2M0=0x00;
+ 216   2            if(BIT_GET(mode,1))P2M1=0xff;else P2M1=0x00;
+ 217   2            break;
+ 218   2          case 3 :
+ 219   2            if(BIT_GET(mode,0))P3M0=0xff;else P3M0=0x00;
+ 220   2            if(BIT_GET(mode,1))P3M1=0xff;else P3M1=0x00;
+C51 COMPILER V9.54   STC_GPIO                                                              08/14/2018 15:33:58 PAGE 5   
+
+ 221   2            break;
+ 222   2          case 4 :
+ 223   2            if(BIT_GET(mode,0))P4M0=0xff;else P4M0=0x00;
+ 224   2            if(BIT_GET(mode,1))P4M1=0xff;else P4M1=0x00;
+ 225   2            break;
+ 226   2          case 5 :
+ 227   2            if(BIT_GET(mode,0))P5M0=0xff;else P5M0=0x00;
+ 228   2            if(BIT_GET(mode,1))P5M1=0xff;else P5M1=0x00;
+ 229   2            break;
+ 230   2          case 6 :
+ 231   2            if(BIT_GET(mode,0))P6M0=0xff;else P6M0=0x00;
+ 232   2            if(BIT_GET(mode,1))P6M1=0xff;else P6M1=0x00;
+ 233   2            break;
+ 234   2          case 7 :
+ 235   2            if(BIT_GET(mode,0))P7M0=0xff;else P7M0=0x00;
+ 236   2            if(BIT_GET(mode,1))P7M1=0xff;else P7M1=0x00;
+ 237   2            break;
+ 238   2          
+ 239   2          default:
+ 240   2            ;//¶ÏÑÔ£¬´«µÝ¶Ë¿Ú²»´æÔÚ
+ 241   2        }
+ 242   1        
+ 243   1      }
+ 244          
+ 245          /*!
+ 246           *@brief  ÉèÖÃÒý½Å×´Ì¬
+ 247           *@param  pxn         IO¿Ú
+ 248           *@param  level_state ×´Ì¬£¬0=µÍµçÆ½£¬1=¸ßµçÆ½  £¨¶ÔÊäÈëÄ£Ê½ÎÞÐ§£©
+ 249           *@warning  Èô¶Ô´®¿ÚËùÔÚÒý½Å½øÐÐÁËIO¿Ú×´Ì¬ÉèÖÃ£¬Ôò¸Ã´®¿Ú¹¦ÄÜ¿ÉÄÜ»áÊÜµ½Ó°Ïì£¡
+ 250           *@Sampleusage£ºgpio_set(p00,0);
+ 251           */
+ 252          void gpio_set(pxn_e pxn,  bool level_state)//ÉèÖÃÒý½Å×´Ì¬
+ 253          {
+ 254   1        switch(px(pxn))
+ 255   1        {
+ 256   2          case 0 :
+ 257   2            if(level_state)BIT_SET(P0,pn(pxn));else BIT_CLR(P0,pn(pxn));//ÉèÖÃÒý½Å×´Ì¬
+ 258   2            break;
+ 259   2          case 1 :
+ 260   2            if(level_state)BIT_SET(P1,pn(pxn));else BIT_CLR(P1,pn(pxn));
+ 261   2            break;
+ 262   2          case 2 :
+ 263   2            if(level_state)BIT_SET(P2,pn(pxn));else BIT_CLR(P2,pn(pxn));
+ 264   2            break;
+ 265   2          case 3 :
+ 266   2            if(level_state)BIT_SET(P3,pn(pxn));else BIT_CLR(P3,pn(pxn));
+ 267   2            break;
+ 268   2          case 4 :
+ 269   2            if(level_state)BIT_SET(P4,pn(pxn));else BIT_CLR(P4,pn(pxn));
+ 270   2            break;
+ 271   2          case 5 :
+ 272   2            if(level_state)BIT_SET(P5,pn(pxn));else BIT_CLR(P5,pn(pxn));
+ 273   2            break;
+ 274   2          case 6 :
+ 275   2            if(level_state)BIT_SET(P6,pn(pxn));else BIT_CLR(P6,pn(pxn));
+ 276   2            break;
+ 277   2          case 7 :
+ 278   2            if(level_state)BIT_SET(P7,pn(pxn));else BIT_CLR(P7,pn(pxn));
+ 279   2            break;
+ 280   2          
+ 281   2          default:
+ 282   2            ;//¶ÏÑÔ£¬´«µÝÒý½Å²»´æÔÚ
+C51 COMPILER V9.54   STC_GPIO                                                              08/14/2018 15:33:58 PAGE 6   
+
+ 283   2        }
+ 284   1      }
+ 285          
+ 286          /*!
+ 287           *@brief  ·´×ªÒý½Å×´Ì¬
+ 288           *@param  pxn         IO¿Ú
+ 289           *@warning  Èô¶Ô´®¿ÚËùÔÚÒý½Å½øÐÐÁËIO¿Ú×´Ì¬ÉèÖÃ£¬Ôò¸Ã´®¿Ú¹¦ÄÜ¿ÉÄÜ»áÊÜµ½Ó°Ïì£¡
+ 290           *@Sampleusage: gpio_turn(p22);
+ 291           */
+ 292          void gpio_turn(pxn_e pxn)//·´×ªÒý½Å×´Ì¬
+ 293          {
+ 294   1        switch(px(pxn))
+ 295   1        {
+ 296   2          case 0 :
+ 297   2            if(BIT_GET(P0,pn(pxn))) BIT_CLR(P0,pn(pxn));else BIT_SET(P0,pn(pxn));//ÉèÖÃÒý½Å×´Ì¬
+ 298   2            break;
+ 299   2          case 1 :
+ 300   2            if(BIT_GET(P1,pn(pxn))) BIT_CLR(P1,pn(pxn));else BIT_SET(P1,pn(pxn));
+ 301   2            break;
+ 302   2          case 2 :
+ 303   2            if(BIT_GET(P2,pn(pxn))) BIT_CLR(P2,pn(pxn));else BIT_SET(P2,pn(pxn));
+ 304   2            break;
+ 305   2          case 3 :
+ 306   2            if(BIT_GET(P3,pn(pxn))) BIT_CLR(P3,pn(pxn));else BIT_SET(P3,pn(pxn));
+ 307   2            break;
+ 308   2          case 4 :
+ 309   2            if(BIT_GET(P4,pn(pxn))) BIT_CLR(P4,pn(pxn));else BIT_SET(P4,pn(pxn));
+ 310   2            break;
+ 311   2          case 5 :
+ 312   2            if(BIT_GET(P5,pn(pxn))) BIT_CLR(P5,pn(pxn));else BIT_SET(P5,pn(pxn));
+ 313   2            break;
+ 314   2          case 6 :
+ 315   2            if(BIT_GET(P6,pn(pxn))) BIT_CLR(P6,pn(pxn));else BIT_SET(P6,pn(pxn));
+ 316   2          case 7 :
+ 317   2            if(BIT_GET(P7,pn(pxn))) BIT_CLR(P7,pn(pxn));else BIT_SET(P7,pn(pxn));
+ 318   2          
+ 319   2          default:
+ 320   2            ;//¶ÏÑÔ£¬´«µÝÒý½Å²»´æÔÚ
+ 321   2        }
+ 322   1      }
+ 323          
+ 324          /*!
+ 325           *@brief  ¶ÁÈ¡Òý½Å×´Ì¬
+ 326           *@param  pxn         IO¿Ú
+ 327           *@Sampleusage: gpio_get(p22);
+ 328           */
+ 329          bool gpio_get(pxn_e pxn)//¶ÁÈ¡Òý½Å×´Ì¬
+ 330          {
+ 331   1        switch(px(pxn))
+ 332   1        {
+ 333   2          case 0 :
+ 334   2            return BIT_GET(P0,pn(pxn));
+ 335   2          case 1 :
+ 336   2            return BIT_GET(P1,pn(pxn));
+ 337   2          case 2 :
+ 338   2            return BIT_GET(P2,pn(pxn));
+ 339   2          case 3 :
+ 340   2            return BIT_GET(P3,pn(pxn));
+ 341   2          case 4 :
+ 342   2            return BIT_GET(P4,pn(pxn));
+ 343   2          case 5 :
+ 344   2            return BIT_GET(P5,pn(pxn));
+C51 COMPILER V9.54   STC_GPIO                                                              08/14/2018 15:33:58 PAGE 7   
+
+ 345   2          case 6 :
+ 346   2            return BIT_GET(P6,pn(pxn));
+ 347   2          case 7 :
+ 348   2            return BIT_GET(P7,pn(pxn));
+ 349   2        }
+ 350   1        return 0;//¶ÏÑÔ£¬´«µÝÒý½Å²»´æÔÚ
+ 351   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =   2705    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----       1
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+   EDATA SIZE       =   ----    ----
+   HDATA SIZE       =   ----    ----
+   XDATA CONST SIZE =   ----    ----
+   FAR CONST SIZE   =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)
